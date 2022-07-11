@@ -44,14 +44,12 @@ function createERPRedeemScript(fedThreshold: number, fedPubKeys: PubKey[], erpTh
 
     script.writeOpCode(OpCode.OP_ELSE)
 
-    // This is the timelock. We use writeBuffer instead of writeNumber
-    // because the library _will_ generate numbers with a leading zero
     script.writeNumber(timelock);
     script.writeOpCode(OpCode.OP_CHECKSEQUENCEVERIFY);
     script.writeOpCode(OpCode.OP_DROP);
 
     // If timelock ok, then check emergency responder signatures
-    // Interestingly, OP_WRITEOPCODEDATA2 is sued here instead of
+    // Interestingly, OP_WRITEOPCODEDATA2 is used here instead of
     // deciding writeOpCode data dinamically. This is a difference between
     // implementation and RSKIP. Here we choose to follow RSKIP.
     script.writeNumber(erpThreshold);
@@ -137,7 +135,7 @@ function createRandomRedeemScript(): RedeemScript {
     // 16 is the max. allowed to be in a check multisig operation by bitcoinj
     const maxFederators = 16;
     const maxEmergencyResponders = 16;
-    const randomTimelock = 51691; // randomInt(256, 65536);
+    const randomTimelock = randomInt(256, 65536);
     const mainFed = createRandomPublicKeys(maxFederators);
     const emergencyFed = createRandomPublicKeys(maxEmergencyResponders);
 
@@ -188,7 +186,7 @@ export function main() {
 
     if (process.argv[2] === "help") {
         console.log("Usage: ./index.ts {iteration number} {output file path} {create invalid flag}")
-        console.log("       All arguments options")
+        console.log("       All arguments optional")
     }
 
     let numberOfIter = process.argv[2] ? parseInt(process.argv[2]) : 1000
@@ -211,7 +209,6 @@ export function main() {
         randomScripts.push(redeemScript);
         if (i % 100 === 0) {
             console.log("[INFO] Progress: " + i + "/" + numberOfIter)
-
         }
     }
 
